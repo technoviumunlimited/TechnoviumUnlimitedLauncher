@@ -70,15 +70,16 @@ namespace TechnoviumUnlimitedLauncher
         {
             InitializeComponent();
             //C:\Users\dakan\AppData\Roaming\TechnoviumUnlimited\Build
-            const string UriScheme = "TechnoviumUnlimited";
-            const string FriendlyName = "TechnoviumUnlimited";
+            const string UriScheme = "technoviumunlimited";
+            const string FriendlyName = "technoviumunlimited";
 
             rootPath = Environment.ExpandEnvironmentVariables("%AppData%\\TechnoviumUnlimited");//Directory.GetCurrentDirectory();
-            var key = Registry.CurrentUser.CreateSubKey("SOFTWARE\\" + UriScheme);
+            var key = Registry.ClassesRoot.CreateSubKey(UriScheme);
+            //Registry.ClassesRoot
 
             // Replace typeof(App) by the class that contains the Main method or any class located in the project that produces the exe.
             // or replace typeof(App).Assembly.Location by anything that gives the full path to the exe
-            string applicationLocation = rootPath + "\\Starter\\TechnoviumUnlimiterStarter.exe";
+            string applicationLocation = rootPath + "\\Starter\\TechnoviumUnlimitedLauncher.exe";
 
             key.SetValue("", "URL:" + FriendlyName);
             key.SetValue("URL Protocol", "");
