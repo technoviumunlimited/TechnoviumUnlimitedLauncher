@@ -40,6 +40,9 @@ namespace TechnoviumUnlimitedLauncher
         private string gameExe;
         private string versionFile;
 
+        private string UriScheme = "TechnoviumUnlimited";
+        private  string FriendlyName = "Technovim Unlimited";
+
         private LauncherStatus _status;
         internal LauncherStatus Status
         {
@@ -69,10 +72,32 @@ namespace TechnoviumUnlimitedLauncher
         public MainWindow()
         {
             InitializeComponent();
-            //C:\Users\dakan\AppData\Roaming\TechnoviumUnlimited\Build
-            const string UriScheme = "technoviumunlimited";
-            const string FriendlyName = "technoviumunlimited";
+            SetRegister();
+            CheckForUpdates();
+        }
 
+        private void Application_Exit(object sender, ExitEventArgs e)
+        {
+            DeleteRegiter();
+        }
+
+        private void DeleteRegiter()
+        {
+            Registry.ClassesRoot.DeleteSubKey(UriScheme);
+            SetRegister();
+        }
+
+        private void SetRegister()
+        {
+
+            string strCmdText;
+            strCmdText = "reg add HKEY_CLASSES_ROOT\\tu2 /t REG_SZ /d \"My Description\" /f";
+            strCmdText += "reg add HKEY_CLASSES_ROOT\\tu2 / v \"URL Protocol\" / t REG_SZ / d \"\" / f";
+            strCmdText += "reg add HKEY_CLASSES_ROOT\\tu2\\shell / f'";
+            strCmdText += "reg add HKEY_CLASSES_ROOT\\tu2\\shell\\open / f";
+            strCmdText += "reg add HKEY_CLASSES_ROOT\\tu2\\shell\\open\\command / t REG_SZ / d C:\\Users\\dakan\\AppData\\Roaming\\TechnoviumUnlimited\\Starter\\TechnoviumUnlimitedLauncher.exe / f";
+
+            //C:\Users\dakan\AppData\Roaming\TechnoviumUnlimited\Build
             rootPath = Environment.ExpandEnvironmentVariables("%AppData%\\TechnoviumUnlimited");//Directory.GetCurrentDirectory();
             var key = Registry.ClassesRoot.CreateSubKey(UriScheme);
             //Registry.ClassesRoot
@@ -80,19 +105,26 @@ namespace TechnoviumUnlimitedLauncher
             // Replace typeof(App) by the class that contains the Main method or any class located in the project that produces the exe.
             // or replace typeof(App).Assembly.Location by anything that gives the full path to the exe
             string applicationLocation = rootPath + "\\Starter\\TechnoviumUnlimitedLauncher.exe";
+            key.SetValue("URL Protocol", "/f");
+            var command = key.CreateSubKey("shell").CreateSubKey("open").CreateSubKey("command");
+            command.SetValue("", applicationLocation);
 
-            key.SetValue("", "URL:" + FriendlyName);
-            key.SetValue("URL Protocol", "");
-
+            //key.SetValue("", "URL:" + FriendlyName);
+            //key.SetValue("URL Protocol", "");
+            /*
             using (var defaultIcon = key.CreateSubKey("DefaultIcon"))
             {
                 defaultIcon.SetValue("", applicationLocation + ",1");
-            }
+            }*/
 
-            using (var commandKey = key.CreateSubKey(@"shell\open\command"))
+            //var command = scheme.CreateSubKey("shell").CreateSubKey("open").CreateSubKey("command");
+            //command.SetValue("", $"\"{Assembly.GetExecutingAssembly().Location}\" \"%1\"");
+
+            /*using (var commandKey = key.CreateSubKey(@"shell\open\command"))
             {
                 commandKey.SetValue("", "\"" + applicationLocation + "\" \"%1\"");
-            }
+            }*/
+
 
             if (!Directory.Exists(rootPath))
             {
@@ -111,7 +143,7 @@ namespace TechnoviumUnlimitedLauncher
             Debug.WriteLine(versionFile);
             Debug.WriteLine("rootpath: ");
             Debug.WriteLine(rootPath);
-            CheckForUpdates();
+            
         }
         private void CheckForUpdates()
         {
